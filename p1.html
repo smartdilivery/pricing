@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خارطة تنفيذ التسعير المزدوج | تركيا</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Chosen Palette: Dynamic Corporate -->
+    <!-- Primary Blue (Stability/Driver): #1e3a8a (blue-900) -->
+    <!-- Vibrant Orange (Revenue/Merchant): #f97316 (orange-500) -->
+    <!-- Success Green (Profit): #10b981 (emerald-500) -->
+    <!-- Background: #f8fafc (slate-50) -->
+
+    <!-- Application Structure Plan:
+         1. Hero Section: High-impact title and core mission statement regarding the Dual Pricing shift in Turkey.
+         2. Concept Visualization: A CSS-only split-path diagram illustrating the separation of Revenue vs Expense logic.
+         3. Driver Mechanism (Expense): Focus on stability. Visualization: Bar chart showing fixed tier payouts (TL).
+         4. Merchant Mechanism (Revenue): Focus on flexibility. Visualization: Multi-line chart comparing different merchant agreements (TL).
+         5. Technical Roadmap: A vertical timeline implementing the 5-step technical plan (Laravel/Angular/Ionic).
+         6. Impact Dashboard: Interactive cards detailing Financial, Operational, and Technical impacts.
+         7. Profit Simulator: A functional interactive element allowing users to test margin calculations.
+    -->
+
+    <!-- Visualization & Content Choices:
+         1. Concept Diagram -> Goal: Inform/Organize -> CSS Flexbox Diagram -> Justification: Shows logic flow without SVG/Mermaid.
+         2. Driver Pay Chart -> Goal: Compare -> Bar Chart (Chart.js) -> Justification: Clearly shows step-function of fixed costs per distance.
+         3. Merchant Fee Chart -> Goal: Compare/Change -> Line Chart (Chart.js) -> Justification: Illustrates the variability and potential gap (margin) between different merchant tiers against fixed costs.
+         4. Roadmap -> Goal: Organize/Process -> HTML Vertical List with CSS connectors -> Justification: Linear progression of the implementation plan.
+         5. Simulator -> Goal: Relationship -> JS Interactive Calculator -> Justification: direct manipulation of variables to understand profit margin.
+         - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        /* Chart Container Styling - Strict Adherence */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Custom Flowchart CSS (No SVG) */
+        .flow-line {
+            width: 2px;
+            background-color: #94a3b8; /* slate-400 */
+            margin: 0 auto;
+            height: 24px;
+        }
+        .flow-arrow::after {
+            content: '▼';
+            display: block;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 14px;
+            line-height: 10px;
+        }
+        .flow-branch {
+            display: flex;
+            justify-content: center;
+            position: relative;
+            padding-top: 20px;
+        }
+        .flow-branch::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 25%;
+            right: 25%;
+            height: 20px;
+            border-top: 2px solid #94a3b8;
+            border-left: 2px solid #94a3b8;
+            border-right: 2px solid #94a3b8;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-4px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="antialiased overflow-x-hidden">
+
+    <!-- Navigation -->
+    <nav class="bg-blue-900 text-white shadow-lg sticky top-0 z-50 opacity-95 backdrop-blur">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="font-bold text-lg md:text-xl flex items-center gap-2">
+                <span>🚀</span> خارطة الطريق: التسعير المزدوج
+            </div>
+            <div class="hidden md:flex gap-6 text-sm font-medium">
+                <a href="#concept" class="hover:text-orange-400 transition">المفهوم</a>
+                <a href="#driver" class="hover:text-orange-400 transition">السائق (المصروف)</a>
+                <a href="#merchant" class="hover:text-orange-400 transition">المتجر (الإيراد)</a>
+                <a href="#roadmap" class="hover:text-orange-400 transition">التنفيذ</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white py-16 px-4 text-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+        <div class="relative z-10 max-w-4xl mx-auto">
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight leading-tight">
+                استراتيجية الفصل المالي:<br>
+                <span class="text-orange-500">الإيراد المتغير</span> vs <span class="text-emerald-400">المصروف الثابت</span>
+            </h1>
+            <p class="text-lg md:text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+                خطة تنفيذية شاملة للسوق التركي تهدف إلى تحرير هوامش الربح التجارية من قيود أجور السائقين، وضمان استقرار العمليات التشغيلية.
+            </p>
+            <div class="flex justify-center gap-4 flex-wrap">
+                <span class="px-4 py-2 bg-white/10 rounded-full text-sm backdrop-blur border border-white/20">📍 السوق: تركيا</span>
+                <span class="px-4 py-2 bg-white/10 rounded-full text-sm backdrop-blur border border-white/20">💱 العملة: الليرة التركية (TL)</span>
+                <span class="px-4 py-2 bg-white/10 rounded-full text-sm backdrop-blur border border-white/20">⚙️ Backend: Laravel</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="container mx-auto px-4 py-12 grid grid-cols-1 gap-16">
+
+        <!-- SECTION 1: The Concept (Flow Diagram) -->
+        <section id="concept" class="scroll-mt-20">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4">1. المفهوم: فصل المسارات</h2>
+                <p class="text-slate-600 max-w-3xl mx-auto">
+                    تتمحور الخطة حول فصل منطق "كم يدفع المطعم" عن "كم يستلم السائق" عند لحظة إنشاء الطلب.
+                    هذا الفصل يسمح بالتحكم في كل مسار بشكل مستقل.
+                </p>
+            </div>
+
+            <!-- CSS Flowchart -->
+            <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-100 max-w-4xl mx-auto">
+                <div class="flex flex-col items-center">
+                    <!-- Step 1: New Order -->
+                    <div class="bg-slate-800 text-white px-6 py-3 rounded-lg shadow-md font-bold z-10">
+                        📦 طلب جديد (New Order)
+                    </div>
+                    
+                    <!-- Connector -->
+                    <div class="flow-line flow-arrow"></div>
+                    
+                    <!-- Step 2: Calculate Distance -->
+                    <div class="bg-slate-100 border border-slate-300 px-6 py-2 rounded-lg text-slate-600 text-sm z-10">
+                        حساب المسافة (Distance Calc)
+                    </div>
+
+                    <!-- Branching -->
+                    <div class="flow-branch w-full max-w-md"></div>
+
+                    <!-- Parallel Paths -->
+                    <div class="grid grid-cols-2 gap-4 md:gap-12 w-full max-w-2xl mt-2">
+                        
+                        <!-- Left Path: Revenue -->
+                        <div class="flex flex-col items-center">
+                            <div class="bg-orange-50 border-2 border-orange-500 text-orange-900 p-4 rounded-xl text-center w-full shadow-sm card-hover">
+                                <div class="text-2xl mb-2">💰</div>
+                                <h3 class="font-bold mb-1">مسار الإيراد</h3>
+                                <p class="text-xs text-orange-700 leading-relaxed">
+                                    البحث في: <b>restaurant_delivery_fees</b><br>
+                                    (مطعم + منطقة + مسافة)
+                                </p>
+                            </div>
+                            <div class="flow-line flow-arrow h-8"></div>
+                            <div class="bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow w-full text-center">
+                                تحصيل: رسوم متغيرة (TL)
+                            </div>
+                        </div>
+
+                        <!-- Right Path: Expense -->
+                        <div class="flex flex-col items-center">
+                            <div class="bg-blue-50 border-2 border-blue-600 text-blue-900 p-4 rounded-xl text-center w-full shadow-sm card-hover">
+                                <div class="text-2xl mb-2">🚚</div>
+                                <h3 class="font-bold mb-1">مسار المصروف</h3>
+                                <p class="text-xs text-blue-700 leading-relaxed">
+                                    البحث في: <b>driver_payout_tiers</b><br>
+                                    (منطقة + مسافة)
+                                </p>
+                            </div>
+                            <div class="flow-line flow-arrow h-8"></div>
+                            <div class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow w-full text-center">
+                                دفع: أجر ثابت (TL)
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Merge/Result -->
+                    <div class="mt-8 pt-6 border-t w-full flex justify-center">
+                        <div class="bg-emerald-100 text-emerald-800 border border-emerald-400 px-8 py-3 rounded-full font-bold shadow-sm">
+                            النتيجة = هامش ربح ديناميكي محفوظ في الـ Database
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2 & 3: Mechanisms Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- SECTION 2: Driver Mechanism (Expense) -->
+            <section id="driver" class="bg-white p-6 md:p-8 rounded-2xl shadow-lg border-t-4 border-blue-600 scroll-mt-24">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                        <span>🚚</span> آليات أجور السائقين
+                    </h2>
+                    <p class="text-slate-500 text-sm mt-2">
+                        الهدف: استقرار المصروفات. يتقاضى السائق أجراً ثابتاً (Fixed TL) بناءً على جدول الشرائح الموحد للمنطقة.
+                    </p>
+                </div>
+
+                <div class="bg-blue-50 p-4 rounded-lg mb-6 text-sm border border-blue-100">
+                    <strong class="text-blue-800 block mb-2">أنواع السائقين:</strong>
+                    <ul class="space-y-2">
+                        <li class="flex items-start gap-2">
+                            <span class="text-blue-500">●</span>
+                            <span><b>السائق الحر:</b> أجر مقطوع حسب المسافة (كما في الرسم البياني).</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-blue-500">●</span>
+                            <span><b>السائق بالساعة:</b> نظام هجين (ساعة عمل + عمولة طلب). يتطلب تتبع المناوبات (Shift Tracking).</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="driverChart"></canvas>
+                </div>
+                <p class="text-center text-xs text-slate-400 mt-2">مثال: جدول الأجور الثابتة للسائقين في إسطنبول</p>
+            </section>
+
+            <!-- SECTION 3: Merchant Mechanism (Revenue) -->
+            <section id="merchant" class="bg-white p-6 md:p-8 rounded-2xl shadow-lg border-t-4 border-orange-500 scroll-mt-24">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                        <span>🏪</span> مرونة تسعير المطاعم
+                    </h2>
+                    <p class="text-slate-500 text-sm mt-2">
+                        الهدف: تعظيم الإيرادات. تختلف الرسوم المحصلة من مطعم لآخر لنفس المسافة، بناءً على الاتفاقية التجارية.
+                    </p>
+                </div>
+
+                <div class="bg-orange-50 p-4 rounded-lg mb-6 text-sm border border-orange-100">
+                    <strong class="text-orange-800 block mb-2">سيناريوهات التسعير:</strong>
+                    <ul class="space-y-2">
+                        <li class="flex items-start gap-2">
+                            <span class="text-orange-500">●</span>
+                            <span><b>مطعم A (Premium):</b> يدفع رسوماً أعلى لخدمة مميزة.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-orange-500">●</span>
+                            <span><b>مطعم B (Discount):</b> يدفع رسوماً أقل لكسب حصة سوقية.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="merchantChart"></canvas>
+                </div>
+                <p class="text-center text-xs text-slate-400 mt-2">مقارنة رسوم مطاعم مختلفة لنفس المسافات (لاحظ الفجوة)</p>
+            </section>
+        </div>
+
+        <!-- SECTION 4: Technical Roadmap -->
+        <section id="roadmap" class="scroll-mt-20">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-slate-800">خارطة التنفيذ التقني</h2>
+                <p class="text-slate-500">خطوات التنفيذ المطلوبة في بيئة Laravel, Angular, و Ionic</p>
+            </div>
+
+            <div class="max-w-4xl mx-auto space-y-6 relative before:absolute before:inset-0 before:mr-4 before:-ml-px md:before:mx-auto before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent">
+                
+                <!-- Step 1 -->
+                <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-slate-200 group-[.is-active]:bg-orange-500 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow z-10 text-white font-bold">1</div>
+                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white p-4 rounded-xl shadow border border-slate-100">
+                        <div class="flex items-center justify-between space-x-2 space-x-reverse mb-1">
+                            <span class="font-bold text-slate-800">قاعدة البيانات (Database)</span>
+                            <span class="text-xs font-mono bg-slate-100 px-2 py-1 rounded text-slate-500">Laravel</span>
+                        </div>
+                        <p class="text-slate-600 text-sm">إنشاء جدول <code>restaurant_delivery_fees</code> يحتوي على (المطعم، المنطقة، المسافة، السعر).</p>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-slate-200 group-[.is-active]:bg-orange-500 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow z-10 text-white font-bold">2</div>
+                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white p-4 rounded-xl shadow border border-slate-100">
+                        <div class="flex items-center justify-between space-x-2 space-x-reverse mb-1">
+                            <span class="font-bold text-slate-800">منطق الاحتساب (Service)</span>
+                            <span class="text-xs font-mono bg-slate-100 px-2 py-1 rounded text-slate-500">Laravel</span>
+                        </div>
+                        <p class="text-slate-600 text-sm">تطوير <code>DeliveryFeeCalculator</code> للبحث عن السعر الخاص أولاً، ثم العودة للسعر العام.</p>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-slate-200 group-[.is-active]:bg-blue-600 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow z-10 text-white font-bold">3</div>
+                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white p-4 rounded-xl shadow border border-slate-100">
+                        <div class="flex items-center justify-between space-x-2 space-x-reverse mb-1">
+                            <span class="font-bold text-slate-800">تثبيت الطلب (Order Logic)</span>
+                            <span class="text-xs font-mono bg-slate-100 px-2 py-1 rounded text-slate-500">Laravel</span>
+                        </div>
+                        <p class="text-slate-600 text-sm">حفظ القيمتين بشكل منفصل في جدول الطلبات: <code>restaurant_charge</code> (للإيراد) و <code>driver_payout</code> (للمصروف).</p>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-slate-200 group-[.is-active]:bg-indigo-600 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow z-10 text-white font-bold">4</div>
+                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white p-4 rounded-xl shadow border border-slate-100">
+                        <div class="flex items-center justify-between space-x-2 space-x-reverse mb-1">
+                            <span class="font-bold text-slate-800">لوحة الإدارة (Admin)</span>
+                            <span class="text-xs font-mono bg-slate-100 px-2 py-1 rounded text-slate-500">Angular</span>
+                        </div>
+                        <p class="text-slate-600 text-sm">إضافة واجهة لإدارة جداول الأسعار الخاصة في صفحة المتجر.</p>
+                    </div>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-slate-200 group-[.is-active]:bg-blue-500 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow z-10 text-white font-bold">5</div>
+                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white p-4 rounded-xl shadow border border-slate-100">
+                        <div class="flex items-center justify-between space-x-2 space-x-reverse mb-1">
+                            <span class="font-bold text-slate-800">تطبيق السائق (App)</span>
+                            <span class="text-xs font-mono bg-slate-100 px-2 py-1 rounded text-slate-500">Ionic</span>
+                        </div>
+                        <p class="text-slate-600 text-sm">ضمان عرض <code>driver_payout</code> فقط، وحجب رسوم المطعم تماماً. إضافة Shift Tracking.</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION 5: Impact Analysis -->
+        <section class="bg-slate-50 rounded-3xl p-8 border border-slate-200">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">تحليل الأثر (The Impact)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Financial -->
+                <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition border-t-4 border-emerald-500">
+                    <h3 class="font-bold text-slate-800 mb-2">💰 الأثر المالي</h3>
+                    <p class="text-slate-600 text-sm mb-3">زيادة الربحية عبر التفاوض الفردي مع المتاجر الكبرى.</p>
+                    <div class="bg-emerald-50 text-emerald-700 text-xs p-2 rounded font-bold">فرصة: هوامش ربح أعلى</div>
+                </div>
+                <!-- Operational -->
+                <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition border-t-4 border-blue-500">
+                    <h3 class="font-bold text-slate-800 mb-2">⚙️ الأثر التشغيلي</h3>
+                    <p class="text-slate-600 text-sm mb-3">زيادة رضا السائقين بسبب استقرار وشفافية الأجور.</p>
+                    <div class="bg-blue-50 text-blue-700 text-xs p-2 rounded font-bold">ميزة: تقليل شكاوى السائقين</div>
+                </div>
+                <!-- Technical -->
+                <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition border-t-4 border-rose-500">
+                    <h3 class="font-bold text-slate-800 mb-2">💻 الأثر التقني</h3>
+                    <p class="text-slate-600 text-sm mb-3">زيادة تعقيد منطق النظام وحاجته لاختبارات دقيقة.</p>
+                    <div class="bg-rose-50 text-rose-700 text-xs p-2 rounded font-bold">تحدي: فصل البيانات بدقة</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: Profit Simulator (Interactive) -->
+        <section class="bg-slate-800 text-white p-8 rounded-3xl shadow-xl text-center">
+            <h2 class="text-2xl font-bold mb-6 text-orange-400">محاكاة الربحية (Profit Simulator)</h2>
+            <div class="max-w-xl mx-auto space-y-6">
+                
+                <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
+                    <div class="w-full">
+                        <label class="block text-xs text-slate-400 mb-1">المسافة (كم)</label>
+                        <input type="range" id="simDistance" min="1" max="15" value="5" class="w-full h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer accent-orange-500" oninput="runSimulation()">
+                        <div class="text-orange-400 font-bold mt-1"><span id="distVal">5</span> كم</div>
+                    </div>
+                    
+                    <div class="w-full">
+                        <label class="block text-xs text-slate-400 mb-1">نوع المطعم</label>
+                        <select id="simMerchant" class="w-full p-2 bg-slate-700 border border-slate-600 rounded text-white text-sm focus:ring-2 focus:ring-orange-500 outline-none" onchange="runSimulation()">
+                            <option value="high">فئة A (سعر مرتفع)</option>
+                            <option value="mid">فئة B (سعر متوسط)</option>
+                            <option value="low">فئة C (سعر مخفض)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4 mt-6">
+                    <div class="bg-white/10 p-3 rounded-lg backdrop-blur">
+                        <div class="text-xs text-slate-300">تحصيل (المطعم)</div>
+                        <div class="text-xl font-bold text-orange-400" id="resRev">0 TL</div>
+                    </div>
+                    <div class="bg-white/10 p-3 rounded-lg backdrop-blur">
+                        <div class="text-xs text-slate-300">دفع (السائق)</div>
+                        <div class="text-xl font-bold text-blue-400" id="driPay">0 TL</div>
+                    </div>
+                    <div class="bg-white/10 p-3 rounded-lg backdrop-blur border border-emerald-500/50">
+                        <div class="text-xs text-emerald-300">صافي الربح</div>
+                        <div class="text-xl font-bold text-emerald-400" id="netPro">0 TL</div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-500 py-8 text-center text-sm border-t border-slate-800">
+        <p>وثيقة تخطيط النظام - إصدار السوق التركي (TL)</p>
+    </footer>
+
+    <!-- JavaScript for Interactions & Charts -->
+    <script>
+        // --- Utility: Label Wrapping (16 chars) ---
+        function wrapLabel(label) {
+            if (typeof label !== 'string' || label.length <= 16) return label;
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = words[0];
+            for (let i = 1; i < words.length; i++) {
+                if ((currentLine + " " + words[i]).length <= 16) {
+                    currentLine += " " + words[i];
+                } else {
+                    lines.push(currentLine);
+                    currentLine = words[i];
+                }
+            }
+            lines.push(currentLine);
+            return lines;
+        }
+
+        // --- Common Chart Options ---
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                tooltip: {
+                    titleFont: { family: 'Cairo', size: 14 },
+                    bodyFont: { family: 'Cairo', size: 13 },
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            const item = tooltipItems[0];
+                            let label = item.chart.data.labels[item.dataIndex];
+                            if (Array.isArray(label)) {
+                                return label.join(' ');
+                            }
+                            return label;
+                        },
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += context.parsed.y + ' TL';
+                            }
+                            return label;
+                        }
+                    }
+                },
+                legend: {
+                    labels: { font: { family: 'Cairo', size: 12 } },
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                x: { ticks: { font: { family: 'Cairo' } } },
+                y: { 
+                    beginAtZero: true,
+                    ticks: { font: { family: 'Cairo' } },
+                    title: { display: true, text: 'السعر (TL)', font: { family: 'Cairo' } }
+                }
+            }
+        };
+
+        // --- 1. Driver Pay Chart (Bar) ---
+        const ctxDriver = document.getElementById('driverChart').getContext('2d');
+        new Chart(ctxDriver, {
+            type: 'bar',
+            data: {
+                labels: ['1-3 كم', '3-5 كم', '5-7 كم', '7-9 كم', '9-12 كم'].map(wrapLabel),
+                datasets: [{
+                    label: 'أجر السائق الثابت (Driver Payout)',
+                    data: [80, 100, 120, 150, 180], // Example TL Data
+                    backgroundColor: 'rgba(37, 99, 235, 0.7)', // Blue
+                    borderColor: '#1d4ed8',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: commonOptions
+        });
+
+        // --- 2. Merchant Fee Chart (Line) ---
+        const ctxMerchant = document.getElementById('merchantChart').getContext('2d');
+        new Chart(ctxMerchant, {
+            type: 'line',
+            data: {
+                labels: ['1-3 كم', '3-5 كم', '5-7 كم', '7-9 كم', '9-12 كم'].map(wrapLabel),
+                datasets: [
+                    {
+                        label: 'مطعم A (Premium Fee)',
+                        data: [110, 140, 170, 210, 250], // Higher fee
+                        borderColor: '#ea580c', // Orange
+                        backgroundColor: '#ea580c',
+                        tension: 0.3
+                    },
+                    {
+                        label: 'مطعم B (Discount Fee)',
+                        data: [90, 110, 130, 160, 190], // Lower fee
+                        borderColor: '#64748b', // Slate
+                        backgroundColor: '#64748b',
+                        borderDash: [5, 5],
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: commonOptions
+        });
+
+        // --- 3. Simulator Logic ---
+        function runSimulation() {
+            const dist = parseInt(document.getElementById('simDistance').value);
+            const type = document.getElementById('simMerchant').value;
+            
+            // Base Driver Logic: 70 TL + 10 TL/km (Example)
+            const driverPay = 70 + (dist * 10);
+            
+            // Merchant Logic
+            let merchantFee = 0;
+            if(type === 'high') merchantFee = 100 + (dist * 15);
+            else if(type === 'mid') merchantFee = 85 + (dist * 12);
+            else merchantFee = 75 + (dist * 10); // Low margin
+
+            const net = merchantFee - driverPay;
+
+            document.getElementById('distVal').innerText = dist;
+            document.getElementById('resRev').innerText = merchantFee + ' TL';
+            document.getElementById('driPay').innerText = driverPay + ' TL';
+            
+            const netEl = document.getElementById('netPro');
+            netEl.innerText = net + ' TL';
+            if(net >= 0) netEl.className = "text-xl font-bold text-emerald-400";
+            else netEl.className = "text-xl font-bold text-rose-400";
+        }
+
+        // Init Sim
+        runSimulation();
+    </script>
+
+    <!-- Chosen Palette: Dynamic Corporate -->
+    <!-- Application Structure Plan: See comments in head -->
+    <!-- Visualization & Content Choices: See comments in head -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</body>
+</html>
