@@ -226,7 +226,85 @@
                 </div>
             </div>
         </section>
+ <!-- SECTION 5: WORKFLOW DIAGRAM -->
+        <section id="workflow" class="scroll-mt-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">1.2. مخطط تدفق العمليات (Workflow)</h2>
+                <p class="text-slate-500">كيف يقوم النظام بمعالجة الطلب وفصل المسارات لحظياً</p>
+            </div>
 
+            <div class="bg-slate-50 border border-slate-200 p-8 rounded-3xl shadow-inner max-w-5xl mx-auto">
+                <div class="flex flex-col items-center w-full">
+                    
+                    <!-- Start -->
+                    <div class="wf-box wf-dark px-8 py-3 rounded-full shadow-lg mb-2">
+                        بدء طلب جديد (New Order)
+                    </div>
+
+                    <!-- Line -->
+                    <div class="flow-line flow-arrow mb-2"></div>
+
+                    <!-- Distance Calc -->
+                    <div class="wf-box wf-gray px-8 py-3 w-64 mb-2">
+                        حساب المسافة (Distance Calculation)
+                    </div>
+
+                    <!-- Branching Lines -->
+                    <div class="flow-branch w-full max-w-3xl"></div>
+
+                    <!-- Parallel Paths Container -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 w-full max-w-4xl mt-2">
+                        
+                        <!-- Left: Expense Path -->
+                        <div class="flex flex-col items-center">
+                            <!-- Logic Box -->
+                            <div class="wf-box wf-blue w-full mb-4">
+                                <div class="text-sm text-blue-600 mb-1">مسار المصروف</div>
+                                بحث: المسافة فقط
+                            </div>
+                            <!-- Arrow -->
+                            <div class="flow-line flow-arrow mb-4 h-8"></div>
+                            <!-- Result Box -->
+                            <div class="wf-box wf-blue-dark w-full">
+                                استرجاع: أجر السائق الثابت
+                                <div class="text-xs opacity-80 font-normal mt-1">(Driver Payout)</div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Revenue Path -->
+                        <div class="flex flex-col items-center">
+                            <!-- Logic Box -->
+                            <div class="wf-box wf-orange w-full mb-4">
+                                <div class="text-sm text-orange-600 mb-1">مسار الإيراد</div>
+                                بحث: هوية المطعم + المسافة
+                            </div>
+                            <!-- Arrow -->
+                            <div class="flow-line flow-arrow mb-4 h-8"></div>
+                            <!-- Result Box -->
+                            <div class="wf-box wf-orange-dark w-full">
+                                استرجاع: رسوم التوصيل المتغيرة
+                                <div class="text-xs opacity-80 font-normal mt-1">(Delivery Fee)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Merge Lines -->
+                    <div class="flex justify-center gap-32 md:gap-64 mt-4 w-full text-slate-400 text-xl">
+                        <span>▼</span>
+                        <span>▼</span>
+                    </div>
+
+                    <!-- Final Result -->
+                    <div class="wf-box wf-green w-full max-w-2xl py-4 mt-2 shadow-xl">
+                        <div class="text-lg mb-1">حفظ الطلب بقيم منفصلة</div>
+                        <div class="inline-block bg-green-800 bg-opacity-20 px-3 py-1 rounded text-sm font-mono">
+                            Profit = Delivery Fee - Driver Payout
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
         <!-- SECTION 2 & 3: Mechanisms Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             
