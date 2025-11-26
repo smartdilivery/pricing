@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحليل نظام التسعير المزدوج | الإيراد والمصروف - تركيا</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Warm Professional -->
+    <!-- Primary: #1e293b (Slate 800 - Stability) -->
+    <!-- Secondary: #d97706 (Amber 600 - Revenue/Variable) -->
+    <!-- Accent: #059669 (Emerald 600 - Driver/Fixed) -->
+    <!-- Background: #f5f5f4 (Stone 100 - Warm Neutral) -->
+
+    <!-- Application Structure Plan:
+         1. Hero Section: Sets the context of the transition to Dual Pricing.
+         2. Interactive Mechanism Comparison: A visual toggle between the "Old Logic" and "New Logic" to visualize the architectural split.
+         3. Dynamic Scenario Simulator: Allows the user to change merchant agreements and distance to see real-time impact on margins vs driver pay (demonstrating the core value).
+         4. Impact Analysis Dashboard: A dedicated section for the NEW content requested, detailing Financial vs Operational impacts using expandable cards.
+         5. Q&A Section: Added to clarify the specific implementation details of distance tiering for both revenue and expense.
+         6. Technical Implementation Roadmap: A checklist for the required system changes.
+    -->
+
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f5f5f4;
+            color: #1e293b;
+        }
+        
+        /* Chart Container Styling - Strict Adherence */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Custom Flowchart CSS (No SVG) */
+        .flow-node {
+            transition: all 0.3s ease;
+        }
+        .flow-line-vertical {
+            width: 2px;
+            background-color: #cbd5e1;
+            margin: 0 auto;
+            height: 20px;
+        }
+        .flow-arrow-down::after {
+            content: '▼';
+            display: block;
+            text-align: center;
+            color: #cbd5e1;
+            font-size: 12px;
+            line-height: 10px;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .impact-card.active {
+            border-right-width: 4px;
+            border-right-color: #d97706;
+            background-color: #fffbeb;
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <!-- Navigation -->
+    <nav class="bg-slate-800 text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="font-bold text-xl">نظام التسعير المزدوج (تركيا)</div>
+            <div class="space-x-4 space-x-reverse text-sm hidden md:flex">
+                <a href="#concept" class="hover:text-amber-400 transition">المفهوم</a>
+                <a href="#simulation" class="hover:text-amber-400 transition">محاكاة الربحية</a>
+                <a href="#impact" class="hover:text-amber-400 transition">تحليل الأثر</a>
+                <a href="#faq" class="hover:text-amber-400 transition">الأسئلة المتكررة</a>
+                <a href="#roadmap" class="hover:text-amber-400 transition">خارطة الطريق</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="container mx-auto px-4 py-12 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold text-slate-800 mb-4">فصل مسار الإيراد عن المصروف</h1>
+        <p class="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+            استراتيجية التحول من التسعير الموحد إلى نموذج ديناميكي في السوق التركي يضمن استقرار أجور السائقين مع تعظيم الأرباح التجارية من المتاجر.
+        </p>
+    </header>
+
+    <!-- SECTION 1: Concept Visualization (Old vs New) -->
+    <section id="concept" class="container mx-auto px-4 py-8 mb-12">
+        <div class="bg-white rounded-xl shadow-md p-8">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">1. هيكلية النظام: مقارنة الآليات</h2>
+                <p class="text-slate-500">استخدم المفتاح أدناه لرؤية الفرق بين النظام الحالي والنظام المقترح.</p>
+                
+                <div class="mt-6 inline-flex bg-slate-100 p-1 rounded-lg">
+                    <button onclick="toggleSystem('old')" id="btn-old" class="px-6 py-2 rounded-md text-sm font-semibold transition bg-white shadow text-slate-800">النظام الحالي (الموحد)</button>
+                    <button onclick="toggleSystem('new')" id="btn-new" class="px-6 py-2 rounded-md text-sm font-semibold transition text-slate-500 hover:text-slate-800">النظام الجديد (المزدوج)</button>
+                </div>
+            </div>
+
+            <div id="diagram-container" class="border border-slate-200 rounded-lg p-6 bg-slate-50 min-h-[400px] relative flex flex-col items-center justify-center transition-all duration-500">
+                <!-- Content injected via JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2: Simulation (Profitability Calculator) -->
+    <section id="simulation" class="container mx-auto px-4 py-8 mb-12">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Controls -->
+            <div class="lg:col-span-1 bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-2xl font-bold text-slate-800 mb-4">2. محاكاة الربحية (TL)</h2>
+                <p class="text-sm text-slate-500 mb-6">جرب تغيير نوع اتفاقية المتجر لترى كيف يتغير هامش الربح (بالليرة التركية) بينما يبقى أجر السائق ثابتاً.</p>
+
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">نوع اتفاقية المتجر (الإيراد)</label>
+                        <select id="merchantTier" class="w-full p-3 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-amber-500 outline-none" onchange="updateSimulation()">
+                            <option value="standard">اتفاقية قياسية (سعر السوق)</option>
+                            <option value="premium">اتفاقية مميزة (سعر أعلى)</option>
+                            <option value="discount">اتفاقية مخفضة (سعر تنافسي)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">مسافة الطلب: <span id="distVal" class="text-amber-600">5</span> كم</label>
+                        <input type="range" id="distanceRange" min="1" max="15" value="5" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-600" oninput="updateSimulation()">
+                        <div class="flex justify-between text-xs text-slate-400 mt-1">
+                            <span>1 كم</span>
+                            <span>15 كم</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-sm text-slate-600">تحصيل من المتجر:</span>
+                            <span class="font-bold text-amber-600" id="revenueDisplay">0.00 TL</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-sm text-slate-600">أجر السائق:</span>
+                            <span class="font-bold text-emerald-600" id="costDisplay">0.00 TL</span>
+                        </div>
+                        <div class="border-t border-slate-300 my-2"></div>
+                        <div class="flex justify-between">
+                            <span class="font-bold text-slate-800">هامش الربح:</span>
+                            <span class="font-bold text-slate-800" id="marginDisplay">0.00 TL</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visualization -->
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-6 flex flex-col items-center justify-center">
+                <h3 class="text-lg font-semibold text-slate-700 mb-4 w-full text-right">تحليل توزيع قيمة الطلب (بالليرة التركية)</h3>
+                <div class="chart-container">
+                    <canvas id="simulationChart"></canvas>
+                </div>
+                <p class="text-xs text-slate-400 mt-4 text-center">
+                    لاحظ: العمود الأخضر (السائق) يتغير فقط بتغير المسافة، بينما العمود البرتقالي (الإيراد) يتغير بتغير الاتفاقية.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: Impact Analysis (The New Content) -->
+    <section id="impact" class="container mx-auto px-4 py-8 mb-12">
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">3. تحليل الأثر ومخاطر الانتقال</h2>
+            <p class="text-slate-600 max-w-4xl">
+                الانتقال من نظام التسعير الموحد إلى المزدوج يحمل تأثيرات عميقة على العمليات والمالية. يوضح القسم التالي الإيجابيات والمخاطر المحتملة لكل جانب.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- Financial Impact Column -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-amber-50 p-4 border-b border-amber-100">
+                    <h3 class="text-lg font-bold text-amber-800 flex items-center">
+                        <span class="text-2xl ml-2">💰</span> الأثر المالي والتجاري
+                    </h3>
+                </div>
+                <div class="p-0">
+                    <!-- Item 1 -->
+                    <div class="impact-card border-b border-slate-100 p-4 cursor-pointer hover:bg-slate-50 transition" onclick="toggleImpact(this)">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-slate-700">تعظيم هامش الربح</span>
+                            <span class="text-emerald-500 text-sm font-bold">+ إيجابي</span>
+                        </div>
+                        <div class="detail hidden mt-3 text-sm text-slate-600 bg-white p-3 rounded border border-slate-100 shadow-inner">
+                            <p class="mb-2"><strong>الفائدة:</strong> القدرة على تحصيل رسوم أعلى من المتاجر الكبرى أو ذات الطلب العالي دون زيادة تكلفة السائق.</p>
+                            <p class="text-rose-600"><strong>المخاطر:</strong> لا يوجد مخاطر مالية مباشرة، ولكن يتطلب دقة في التفاوض.</p>
+                        </div>
+                    </div>
+
+                    <!-- Item 2 -->
+                    <div class="impact-card border-b border-slate-100 p-4 cursor-pointer hover:bg-slate-50 transition" onclick="toggleImpact(this)">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-slate-700">مرونة التنافسية</span>
+                            <span class="text-emerald-500 text-sm font-bold">+ إيجابي</span>
+                        </div>
+                        <div class="detail hidden mt-3 text-sm text-slate-600 bg-white p-3 rounded border border-slate-100 shadow-inner">
+                            <p class="mb-2"><strong>الفائدة:</strong> إمكانية تقديم عروض خاصة ومخفضة لمتاجر معينة لكسب حصة سوقية دون التأثير على أجر السائق.</p>
+                            <p class="text-rose-600"><strong>المخاطر:</strong> قد يشعر الشركاء الصغار بعدم العدالة إذا اكتشفوا تباين الأسعار.</p>
+                        </div>
+                    </div>
+
+                    <!-- Item 3 -->
+                    <div class="impact-card p-4 cursor-pointer hover:bg-slate-50 transition" onclick="toggleImpact(this)">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-slate-700">تعقيد إدارة البيانات</span>
+                            <span class="text-amber-500 text-sm font-bold">⚠ تحدي</span>
+                        </div>
+                        <div class="detail hidden mt-3 text-sm text-slate-600 bg-white p-3 rounded border border-slate-100 shadow-inner">
+                            <p class="mb-2"><strong>الوضع:</strong> إدارة جدول أسعار ثلاثي الأبعاد (مطعم + مسافة + سعر) أكثر تعقيداً من السعر الموحد.</p>
+                            <p class="text-rose-600"><strong>المخاطر:</strong> زيادة احتمال الخطأ البشري في إدخال البيانات، مما قد يؤدي لخسائر غير مرئية.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Operational Impact Column -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-blue-50 p-4 border-b border-blue-100">
+                    <h3 class="text-lg font-bold text-blue-800 flex items-center">
+                        <span class="text-2xl ml-2">⚙️</span> الأثر التشغيلي (السائقين)
+                    </h3>
+                </div>
+                <div class="p-0">
+                    <!-- Item 1 -->
+                    <div class="impact-card border-b border-slate-100 p-4 cursor-pointer hover:bg-slate-50 transition" onclick="toggleImpact(this)">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-slate-700">رضا واستقرار السائقين</span>
+                            <span class="text-emerald-500 text-sm font-bold">+ إيجابي</span>
+                        </div>
+                        <div class="detail hidden mt-3 text-sm text-slate-600 bg-white p-3 rounded border border-slate-100 shadow-inner">
+                            <p class="mb-2"><strong>الفائدة:</strong> السائق يثق في النظام لأن أجره يعتمد على جهده (المسافة) فقط، ولا يتأثر بصفقات الشركة مع المطعم.</p>
+                            <p class="text-rose-600"><strong>المخاطر:</strong> انخفاض "المفاجآت السارة" (Tips أو زيادات عشوائية) قد يقلل الحماس لدى البعض.</p>
+                        </div>
+                    </div>
+
+                    <!-- Item 2 -->
+                    <div class="impact-card border-b border-slate-100 p-4 cursor-pointer hover:bg-slate-50 transition" onclick="toggleImpact(this)">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-slate-700">وضوح الواجهات (App UI)</span>
+                            <span class="text-emerald-500 text-sm font-bold">+ إيجابي</span>
+                        </div>
+                        <div class="detail hidden mt-3 text-sm text-slate-600 bg-white p-3 rounded border border-slate-100 shadow-inner">
+                            <p class="mb-2"><strong>الفائدة:</strong> تطبيق السائق يعرض رقماً واحداً فقط (أجره)، مما ينهي الجدل حول نسبة العمولة.</p>
+                            <p class="text-rose-600"><strong>المخاطر:</strong> ضرورة التأكد التقني من عدم تسرب بيانات "الإيراد" لواجهة السائق بالخطأ.</p>
+                        </div>
+                    </div>
+
+                     <!-- Item 3 -->
+                     <div class="impact-card p-4 cursor-pointer hover:bg-slate-50 transition" onclick="toggleImpact(this)">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-slate-700">جمود الحوافز الجغرافية</span>
+                            <span class="text-amber-500 text-sm font-bold">⚠ تحدي</span>
+                        </div>
+                        <div class="detail hidden mt-3 text-sm text-slate-600 bg-white p-3 rounded border border-slate-100 shadow-inner">
+                            <p class="mb-2"><strong>الوضع:</strong> توحيد الأجر حسب المسافة يجعل من الصعب تحفيز السائقين للذهاب لمناطق نائية بنفس التكلفة.</p>
+                            <p class="text-rose-600"><strong>المخاطر:</strong> قد نحتاج لإضافة طبقة "Bonuses" منفصلة للمناطق الميتة، مما يعيد بعض التعقيد.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- NEW SECTION: FAQ -->
+    <section id="faq" class="container mx-auto px-4 py-8 mb-12">
+        <div class="bg-white rounded-xl shadow-md p-8 border border-slate-200">
+            <h2 class="text-3xl font-bold text-slate-800 mb-6 border-b pb-3">4. أسئلة متكررة حول الهيكلية الجديدة</h2>
+            <p class="text-slate-600 mb-6">
+                هذه الأسئلة تهدف لتوضيح الهيكلية الدقيقة لتطبيق نظام الشرائح الثابتة والمتغيرة على مستوى قواعد البيانات والمنطق، **باستخدام الليرة التركية (TL) كوحدة عملة**.
+            </p>
+
+            <div class="space-y-6">
+                <!-- Q1: Driver Pay Tiers -->
+                <div class="p-4 bg-slate-50 rounded-lg border border-emerald-300 shadow-inner">
+                    <h3 class="font-bold text-lg text-slate-800 mb-2 flex items-start">
+                        <span class="text-xl text-emerald-600 ml-2">✔️</span> س: هل يتم احتساب أجر السائق (المصروف) على شكل شرائح مسافة ثابتة؟
+                    </h3>
+                    <p class="text-slate-700 leading-relaxed">
+                        **نعم، يتم الاحتساب على شكل شرائح مسافة ثابتة وموحدة لجميع السائقين في المنطقة الواحدة.** الأجر يعتمد على جدول ثابت يتم إعداده في شاشة "إعدادات المنطقة" ويخص أجور السائقين فقط، ولا يتأثر برسوم المتجر.
+                    </p>
+                    <div class="mt-3 p-3 bg-emerald-50 border border-emerald-100 rounded text-sm text-emerald-700">
+                        **مثال تطبيقي:** 1 - 5 كم: أجر السائق 100 ليرة تركية (TL). | 6 - 10 كم: أجر السائق 150 ليرة تركية (TL).
+                    </div>
+                </div>
+
+                <!-- Q2: Merchant Fee Tiers -->
+                <div class="p-4 bg-slate-50 rounded-lg border border-amber-300 shadow-inner">
+                    <h3 class="font-bold text-lg text-slate-800 mb-2 flex items-start">
+                        <span class="text-xl text-amber-600 ml-2">🔄</span> س: هل يتم تحديد رسوم المطعم (الإيراد) على شكل جدول شرائح مسافة متغير لكل متجر؟
+                    </h3>
+                    <p class="text-slate-700 leading-relaxed">
+                        **نعم، يتم تحديد رسوم التوصيل على شكل شرائح مسافة متغيرة ومخصصة لكل متجر على حدة.** يتم إعداد هذا الجدول الخاص في شاشة "تعديل بيانات المتجر"، مما يسمح بتطبيق تسعير تفاوضي ومختلف بين الشركاء.
+                    </p>
+                    <div class="mt-3 p-3 bg-amber-50 border border-amber-100 rounded text-sm text-amber-700">
+                        **مثال تطبيقي:** المتجر (أ): 1-5 كم بسعر 120 TL. | المتجر (ب): 1-5 كم بسعر 150 TL.
+                    </div>
+                </div>
+
+                <!-- Q3: Region Variable Role -->
+                <div class="p-4 bg-slate-50 rounded-lg border border-blue-300 shadow-inner">
+                    <h3 class="font-bold text-lg text-slate-800 mb-2 flex items-start">
+                        <span class="text-xl text-blue-600 ml-2">📍</span> س: هل سيتم إلغاء احتساب المسافة حسب المنطقة أم ستضاف كمتغير في التسعير الجديد؟
+                    </h3>
+                    <p class="text-slate-700 leading-relaxed">
+                        **المنطقة (Region) تبقى متغيراً حيوياً للنظام المزدوج في كلا المسارين:**
+                        <ul class="list-disc list-inside mt-3 space-y-1 text-sm mr-4">
+                            <li>**في مسار المصروف (أجر السائق):** يتم تجميع السائقين في منطقة معينة، ويتم تطبيق جدول الأجر الثابت الخاص **بتلك المنطقة**. (مثلاً، أجور سائقي أنقرة تختلف عن أجور سائقي إسطنبول).</li>
+                            <li>**في مسار الإيراد (رسوم المطعم):** جدول الرسوم المتغير للمتجر الواحد هو جدول مرتبط **بالمنطقة الجغرافية** التي يخدمها. هذا يسمح للمتجر بوجود أسعار توصيل مختلفة إذا كان يخدم أكثر من منطقة.</li>
+                        </ul>
+                        **خلاصة:** يتم استخدام المنطقة لتحديد أي جدول تسعير يجب تطبيقه (سواء أجور ثابتة للسائقين أو رسوم متغيرة للمتاجر).
+                    </p>
+                    <div class="mt-3 p-3 bg-blue-50 border border-blue-100 rounded text-sm text-blue-700">
+                        **المتغيرات الأساسية:**
+                        <ul>
+                            <li>**المصروف:** (المنطقة) + (المسافة) = الأجر الثابت (TL)</li>
+                            <li>**الإيراد:** (المتجر) + (المنطقة) + (المسافة) = الرسوم المتغيرة (TL)</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 5: Roadmap (Implementation Checklist) -->
+    <section id="roadmap" class="container mx-auto px-4 py-8 mb-12 bg-slate-800 rounded-xl text-white">
+        <h2 class="text-2xl font-bold mb-6 border-b border-slate-600 pb-4">5. متطلبات التنفيذ التقني</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+            
+            <div class="bg-slate-700 p-4 rounded-lg">
+                <h3 class="font-bold text-amber-400 mb-2">1. قاعدة البيانات (DB)</h3>
+                <ul class="space-y-2 text-slate-300">
+                    <li>• إنشاء جدول <code>restaurant_fees</code> (المطعم + المنطقة + المسافة).</li>
+                    <li>• تعديل جدول <code>regions</code> ليصبح مصدراً لأجور السائقين فقط <code>driver_payouts</code>.</li>
+                </ul>
+            </div>
+
+            <div class="bg-slate-700 p-4 rounded-lg">
+                <h3 class="font-bold text-blue-400 mb-2">2. المنطق الخلفي (Backend)</h3>
+                <ul class="space-y-2 text-slate-300">
+                    <li>• فصل دالة التسعير إلى دالتين متوازيتين: <code>calcRevenue()</code> و <code>calcExpense()</code>.</li>
+                    <li>• حفظ القيمتين بشكل منفصل في سجل الطلب <code>orders</code>.</li>
+                </ul>
+            </div>
+
+            <div class="bg-slate-700 p-4 rounded-lg">
+                <h3 class="font-bold text-emerald-400 mb-2">3. الواجهات (Frontend)</h3>
+                <ul class="space-y-2 text-slate-300">
+                    <li>• <strong>تطبيق السائق:</strong> ربط العرض بحقل المصروف فقط (بالليرة التركية).</li>
+                    <li>• <strong>لوحة الإدارة:</strong> إضافة شاشة لإدارة أسعار المطاعم الخاصة.</li>
+                </ul>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-500 py-6 text-center text-sm">
+        <p>تقرير تحليل النظام المقترح - وثيقة داخلية للسوق التركي</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- 1. Concept Visualization Logic ---
+        const diagramContainer = document.getElementById('diagram-container');
+        const btnOld = document.getElementById('btn-old');
+        const btnNew = document.getElementById('btn-new');
+
+        // Note: I will use the updated 'newDiagramHTML' which includes Region in the path.
+        const oldDiagramHTML = `
+            <div class="flex flex-col items-center flow-node">
+                <div class="bg-slate-200 px-6 py-3 rounded shadow text-slate-600 font-bold mb-2">طلب جديد</div>
+                <div class="flow-arrow-down mb-2"></div>
+                <div class="bg-slate-300 px-6 py-3 rounded shadow text-slate-700 border border-slate-400 mb-2">
+                    تحديد المنطقة (Region)
+                </div>
+                <div class="flow-arrow-down mb-2"></div>
+                <div class="bg-white px-6 py-4 rounded shadow-lg border-2 border-slate-400 text-center w-64">
+                    <div class="text-xs text-slate-400 uppercase tracking-widest mb-1">تسعير موحد</div>
+                    <div class="font-bold text-slate-800">قيمة واحدة للمطعم والسائق (بالليرة التركية)</div>
+                    <div class="text-xs text-rose-500 mt-2">علاقة مباشرة: تغيير السعر يؤثر على الطرفين</div>
+                </div>
+            </div>
+        `;
+
+        const newDiagramHTML = `
+            <div class="flex flex-col items-center w-full flow-node">
+                <div class="bg-slate-200 px-6 py-3 rounded shadow text-slate-600 font-bold mb-4">طلب جديد</div>
+                <div class="flow-arrow-down mb-4"></div>
+                
+                <div class="flex flex-row justify-center w-full gap-8 md:gap-16">
+                    <!-- Path 1: Revenue -->
+                    <div class="flex flex-col items-center w-1/2 max-w-xs">
+                        <div class="bg-amber-100 px-4 py-2 rounded text-amber-800 text-xs font-bold mb-2 border border-amber-300">مسار الإيراد</div>
+                        <div class="bg-white p-4 rounded shadow-md border-r-4 border-amber-500 w-full text-center">
+                            <div class="text-sm text-slate-500 mb-1">البحث بـ:</div>
+                            <div class="font-bold text-slate-800">المطعم + المنطقة + المسافة</div>
+                            <div class="my-2 border-t border-slate-100"></div>
+                            <div class="text-amber-600 font-bold text-lg">رسوم متغيرة (TL)</div>
+                        </div>
+                    </div>
+
+                    <!-- Path 2: Expense -->
+                    <div class="flex flex-col items-center w-1/2 max-w-xs">
+                        <div class="bg-emerald-100 px-4 py-2 rounded text-emerald-800 text-xs font-bold mb-2 border border-emerald-300">مسار المصروف</div>
+                        <div class="bg-white p-4 rounded shadow-md border-r-4 border-emerald-500 w-full text-center">
+                            <div class="text-sm text-slate-500 mb-1">البحث بـ:</div>
+                            <div class="font-bold text-slate-800">المنطقة + المسافة</div>
+                            <div class="my-2 border-t border-slate-100"></div>
+                            <div class="text-emerald-600 font-bold text-lg">أجر ثابت (TL)</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 bg-slate-800 text-white px-6 py-2 rounded-full text-sm shadow-lg">
+                    النتيجة: هامش ربح ديناميكي
+                </div>
+            </div>
+        `;
+
+        function toggleSystem(type) {
+            if(type === 'old') {
+                diagramContainer.innerHTML = oldDiagramHTML;
+                btnOld.classList.remove('text-slate-500');
+                btnOld.classList.add('bg-white', 'shadow', 'text-slate-800');
+                btnNew.classList.remove('bg-white', 'shadow', 'text-slate-800');
+                btnNew.classList.add('text-slate-500');
+            } else {
+                diagramContainer.innerHTML = newDiagramHTML;
+                btnNew.classList.remove('text-slate-500');
+                btnNew.classList.add('bg-white', 'shadow', 'text-slate-800');
+                btnOld.classList.remove('bg-white', 'shadow', 'text-slate-800');
+                btnOld.classList.add('text-slate-500');
+            }
+        }
+
+        // Initialize Diagram
+        toggleSystem('new');
+
+
+        // --- 2. Simulation Logic & Chart ---
+        const distRange = document.getElementById('distanceRange');
+        const distVal = document.getElementById('distVal');
+        const merchantTier = document.getElementById('merchantTier');
+        const revenueDisplay = document.getElementById('revenueDisplay');
+        const costDisplay = document.getElementById('costDisplay');
+        const marginDisplay = document.getElementById('marginDisplay');
+
+        // Data Models (Using TL as currency base)
+        // Driver Pay: 10 TL base + 2 TL per km
+        const getDriverPay = (km) => 10 + (km * 2);
+        
+        // Merchant Fee Models
+        const merchantModels = {
+            'standard': (km) => 15 + (km * 3),      // Standard Market Rate
+            'premium': (km) => 20 + (km * 4),       // High End Brand
+            'discount': (km) => 12 + (km * 2.5)     // Small Business/Promo
+        };
+
+        let simChart;
+
+        function initChart() {
+            const ctx = document.getElementById('simulationChart').getContext('2d');
+            Chart.defaults.font.family = 'Cairo';
+            
+            simChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['توزيع القيمة المالية'],
+                    datasets: [
+                        {
+                            label: 'أجر السائق (ثابت - TL)',
+                            data: [0],
+                            backgroundColor: '#059669', // Emerald 600
+                            borderRadius: 4,
+                            barPercentage: 0.5
+                        },
+                        {
+                            label: 'هامش الربح (متغير - TL)',
+                            data: [0],
+                            backgroundColor: '#d97706', // Amber 600
+                            borderRadius: 4,
+                            barPercentage: 0.5
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            rtl: true,
+                            bodyFont: { family: 'Cairo' },
+                            titleFont: { family: 'Cairo' },
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y.toFixed(2) + ' TL';
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        legend: {
+                            labels: { font: { family: 'Cairo' } },
+                            position: 'bottom'
+                        }
+                    },
+                    scales: {
+                        x: { stacked: true, grid: { display: false } },
+                        y: { 
+                            stacked: true, 
+                            beginAtZero: true,
+                            title: { display: true, text: 'ليرة تركية (TL)' } // Currency label
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateSimulation() {
+            const km = parseInt(distRange.value);
+            const tier = merchantTier.value;
+            
+            // Update UI Text
+            distVal.innerText = km;
+
+            // Calculations
+            const driverCost = getDriverPay(km);
+            const totalRevenue = merchantModels[tier](km);
+            const margin = totalRevenue - driverCost;
+
+            // Update DOM Numbers with "TL" suffix
+            costDisplay.innerText = driverCost.toFixed(2) + ' TL';
+            revenueDisplay.innerText = totalRevenue.toFixed(2) + ' TL';
+            marginDisplay.innerText = margin.toFixed(2) + ' TL';
+
+            // Styling based on margin
+            if(margin < 0) {
+                marginDisplay.classList.remove('text-slate-800');
+                marginDisplay.classList.add('text-rose-600');
+            } else {
+                marginDisplay.classList.remove('text-rose-600');
+                marginDisplay.classList.add('text-slate-800');
+            }
+
+            // Update Chart
+            simChart.data.datasets[0].data = [driverCost];
+            simChart.data.datasets[1].data = [margin];
+            simChart.update();
+        }
+
+        // --- 3. Impact Card Logic ---
+        function toggleImpact(card) {
+            // Close others (optional, but cleaner)
+            document.querySelectorAll('.impact-card').forEach(c => {
+                if(c !== card) {
+                    c.classList.remove('active');
+                    c.querySelector('.detail').classList.add('hidden');
+                }
+            });
+
+            // Toggle current
+            const detail = card.querySelector('.detail');
+            if (detail.classList.contains('hidden')) {
+                detail.classList.remove('hidden');
+                card.classList.add('active');
+            } else {
+                detail.classList.add('hidden');
+                card.classList.remove('active');
+            }
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            initChart();
+            updateSimulation();
+        });
+
+    </script>
+    
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</body>
+</html>
