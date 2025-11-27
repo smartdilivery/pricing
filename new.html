@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام Akıllı Kurye | استراتيجية السوق التركي</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .chart-container { position: relative; width: 100%; height: 300px; }
+        .card-hover:hover { transform: translateY(-4px); transition: 0.3s; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        
+        /* Workflow Nodes */
+        .wf-node { padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; border: 2px solid; background: white; }
+        .wf-line { width: 2px; height: 20px; background: #cbd5e1; margin: 0 auto; }
+        .wf-arrow::after { content: '▼'; display: block; text-align: center; color: #cbd5e1; }
+        
+        /* Brand Colors */
+        .brand-text { color: #f59e0b; } /* Amber-500 similar to Akilli Kurye logo usually */
+    </style>
+</head>
+<body class="antialiased overflow-x-hidden">
+
+    <!-- Navigation -->
+    <nav class="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="font-bold text-lg flex items-center gap-2">
+                <span class="text-2xl">🛵</span> 
+                <span>Akıllı Kurye <span class="text-xs font-normal text-slate-400">| Financial System</span></span>
+            </div>
+            <div class="hidden lg:flex gap-4 text-xs font-medium">
+                <a href="#rules" class="hover:text-amber-400">القواعد المالية</a>
+                <a href="#merchant-logic" class="hover:text-amber-400">المتاجر</a>
+                <a href="#driver-logic" class="hover:text-blue-400">السائقين</a>
+                <a href="#dispatch" class="hover:text-emerald-400">الإسناد</a>
+                <a href="#simulator" class="hover:text-amber-400">المحاكاة</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="bg-gradient-to-br from-slate-800 to-slate-900 text-white py-16 px-4 text-center border-b-4 border-amber-500">
+        <h1 class="text-3xl md:text-5xl font-extrabold mb-4">
+            المنظومة المالية لـ <span class="text-amber-500">Akıllı Kurye</span>
+        </h1>
+        <p class="text-slate-300 max-w-2xl mx-auto mb-6">
+            استراتيجية السوق التركي: فصل المسارات، ضريبة KDV 20%، والإسناد الذكي.
+        </p>
+        <div class="flex justify-center gap-4 text-sm font-mono">
+            <span class="bg-amber-600 px-3 py-1 rounded">KDV 20%</span>
+            <span class="bg-blue-600 px-3 py-1 rounded">Mon-Sun Cycle</span>
+            <span class="bg-emerald-600 px-3 py-1 rounded">Ajil (Credit)</span>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-12 space-y-16">
+
+        <!-- 1. General Financial Rules -->
+        <section id="rules" class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 border-b pb-2">1. القواعد المالية العامة (General Rules)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-slate-50 p-4 rounded-xl border-r-4 border-amber-500">
+                    <h3 class="font-bold text-amber-700">الضريبة المضافة (KDV)</h3>
+                    <p class="text-sm text-slate-600 mt-1">نسبة ثابتة <span class="font-bold">20%</span> تضاف على كل فاتورة في Akıllı Kurye. يتم فصل "المبلغ المستحق" عن "الضريبة" في التقارير.</p>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl border-r-4 border-blue-500">
+                    <h3 class="font-bold text-blue-700">الدورة المالية</h3>
+                    <p class="text-sm text-slate-600 mt-1">يبدأ الأسبوع يوم <span class="font-bold">الاثنين</span> وينتهي يوم <span class="font-bold">الأحد</span>. الفواتير تصدر بنظام "الآجل" (Credit) لملاءمة السوق التركي.</p>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl border-r-4 border-emerald-500">
+                    <h3 class="font-bold text-emerald-700">المرونة</h3>
+                    <p class="text-sm text-slate-600 mt-1">إمكانية تبديل نظام المتجر أو السائق (ساعات ↔ طلبات) في أي وقت عبر لوحة تحكم Akıllı Kurye.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Merchant Logic -->
+        <section id="merchant-logic">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">2. آليات حساب المتاجر (Revenue)</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Model A: Per Order -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-amber-500">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-slate-800">أ. نظام الطلبات (Per Order)</h3>
+                        <span class="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded">Standard</span>
+                    </div>
+                    <ul class="space-y-3 text-sm text-slate-600">
+                        <li class="flex items-start gap-2">
+                            <span>✅</span>
+                            <span><b>سعر التوصيل:</b> حسب فئة المسافة الخاصة بالمتجر (مثال: 1-5 كم = 100 TL).</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span>✅</span>
+                            <span><b>حساب الضريبة:</b> 100 TL + (20%) = <span class="font-bold text-amber-600">120 TL</span> (تخصم من الرصيد).</span>
+                        </li>
+                        <li class="flex items-start gap-2 bg-red-50 p-2 rounded border border-red-100">
+                            <span>⚠️</span>
+                            <span><b>شرط الحد الأدنى (Minimum Guarantee):</b> إذا لم يحقق المطعم عدد الطلبات المتفق عليه (أسبوعياً/يومياً)، يتم تغريمه:<br>
+                            <code>(الطلبات الناقصة × سعر أقل فئة مسافة)</code>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Model B: Hourly -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-purple-500">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-slate-800">ب. نظام الساعات (Dedicated)</h3>
+                        <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">VIP / High Volume</span>
+                    </div>
+                    <ul class="space-y-3 text-sm text-slate-600">
+                        <li class="flex items-start gap-2">
+                            <span>✅</span>
+                            <span><b>التخصيص:</b> تأجير سائق Akıllı Kurye محدد لفترة (مثلاً 8:00 - 15:00). لا يستقبل السائق طلبات خارجية.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span>✅</span>
+                            <span><b>معادلة الحساب:</b><br>
+                            <code>(عدد الساعات × سعر الساعة) + (عدد الطلبات × مبلغ ثابت)</code>
+                            </span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span>✅</span>
+                            <span><b>مثال:</b> (45 ساعة × 200) + (150 طلب × 10) = 10,500 TL<br>
+                            + الضريبة (20%) = <span class="font-bold text-purple-600">12,600 TL</span>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Driver Logic -->
+        <section id="driver-logic">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">3. آليات حساب السائقين (Expense)</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Driver Model A -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-blue-500">
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">أ. السائق الحر (Per Order)</h3>
+                    <div class="text-sm text-slate-600 space-y-2">
+                        <p>يعتمد الأجر على <b>جدول "إعدادات المنطقة"</b> الموحد في Akıllı Kurye.</p>
+                        <div class="bg-blue-50 p-3 rounded border border-blue-100 font-mono text-xs">
+                            1-5 كم  : 100 TL<br>
+                            6-10 كم : 150 TL<br>
+                            10+ كم  : +X TL لكل كم
+                        </div>
+                        <p class="text-xs text-slate-400 mt-2">* الإسناد يتم بالتوالي (Round Robin) حسب المنطقة.</p>
+                    </div>
+                </div>
+
+                <!-- Driver Model B -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-indigo-500">
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">ب. سائق بالساعة (Hourly/Shift)</h3>
+                    <div class="text-sm text-slate-600 space-y-2">
+                        <p>يتم إسناده لمطعم محدد عبر <b>"شاشة تخصيص السائق"</b>.</p>
+                        <div class="bg-indigo-50 p-3 rounded border border-indigo-100">
+                            <b>المدخلات:</b> السائق + المطعم + وقت البدء/الانتهاء.<br>
+                            <b>التسعير:</b> سعر الساعة (حسب المنطقة) + مبلغ ثابت لكل طلب.
+                        </div>
+                        <p class="text-red-500 text-xs font-bold mt-2">🛑 تنبيه: تظهر له طلبات هذا المطعم فقط.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Dispatch Logic Visualization -->
+        <section id="dispatch" class="bg-slate-100 rounded-3xl p-8">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">4. آلية إسناد الطلبات (Dispatch Logic)</h2>
+            
+            <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
+                
+                <!-- Scenario 1: Hourly Merchant -->
+                <div class="flex flex-col items-center">
+                    <div class="mb-2 font-bold text-purple-700">سيناريو 1: مطعم بنظام الساعات</div>
+                    <div class="wf-node border-purple-500 text-purple-900 w-full">طلب جديد من (مطعم مخصص)</div>
+                    <div class="wf-line wf-arrow"></div>
+                    <div class="wf-node border-slate-400 w-full bg-slate-50">فلتر: هل يوجد سائقين "مخصصين" مسجلين دخول؟</div>
+                    <div class="wf-line wf-arrow"></div>
+                    <div class="wf-node border-green-500 bg-green-50 w-full">
+                        توزيع بالتوالي (Round Robin)<br>
+                        <span class="text-xs font-normal">على السائقين المخصصين لهذا المطعم فقط</span>
+                    </div>
+                </div>
+
+                <!-- Scenario 2: Per Order Merchant -->
+                <div class="flex flex-col items-center">
+                    <div class="mb-2 font-bold text-amber-700">سيناريو 2: مطعم بنظام الطلبات</div>
+                    <div class="wf-node border-amber-500 text-amber-900 w-full">طلب جديد من (مطعم عام)</div>
+                    <div class="wf-line wf-arrow"></div>
+                    <div class="wf-node border-slate-400 w-full bg-slate-50">فلتر: البحث في سائقي "المنطقة" الأحرار</div>
+                    <div class="wf-line wf-arrow"></div>
+                    <div class="wf-node border-blue-500 bg-blue-50 w-full">
+                        توزيع بالتوالي (Round Robin)<br>
+                        <span class="text-xs font-normal">شرط: نفس المنطقة ونفس المسار</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 5. Advanced Simulator -->
+        <section id="simulator" class="bg-slate-800 text-white p-10 rounded-3xl shadow-2xl relative overflow-hidden">
+            <div class="relative z-10">
+                <h2 class="text-2xl font-bold mb-8 text-amber-400 text-center">5. محاكي Akıllı Kurye المالي</h2>
+                
+                <!-- Toggle Mode -->
+                <div class="flex justify-center mb-8 bg-slate-700 p-1 rounded-lg inline-flex w-max mx-auto">
+                    <button onclick="setMode('order')" id="btnOrder" class="px-6 py-2 rounded-md bg-amber-500 text-white transition">نظام الطلبات</button>
+                    <button onclick="setMode('hourly')" id="btnHourly" class="px-6 py-2 rounded-md text-slate-300 hover:text-white transition">نظام الساعات</button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                    
+                    <!-- Input Controls -->
+                    <div class="space-y-6">
+                        <!-- Order Mode Inputs -->
+                        <div id="orderInputs">
+                            <label class="block text-xs text-slate-400 mb-1">المسافة (كم)</label>
+                            <input type="range" id="inpDist" min="1" max="15" value="5" class="w-full mb-4 accent-amber-500" oninput="calc()">
+                            
+                            <label class="block text-xs text-slate-400 mb-1">سعر الفئة (الأساس)</label>
+                            <input type="number" id="inpFee" value="100" class="w-full bg-slate-700 rounded p-2 text-sm border border-slate-600" oninput="calc()">
+                        </div>
+
+                        <!-- Hourly Mode Inputs -->
+                        <div id="hourlyInputs" class="hidden">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">عدد الساعات</label>
+                                    <input type="number" id="inpHours" value="10" class="w-full bg-slate-700 rounded p-2 text-sm border border-slate-600" oninput="calc()">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">سعر الساعة</label>
+                                    <input type="number" id="inpRate" value="200" class="w-full bg-slate-700 rounded p-2 text-sm border border-slate-600" oninput="calc()">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">عدد الطلبات</label>
+                                    <input type="number" id="inpOrders" value="30" class="w-full bg-slate-700 rounded p-2 text-sm border border-slate-600" oninput="calc()">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">مبلغ ثابت/طلب</label>
+                                    <input type="number" id="inpFix" value="10" class="w-full bg-slate-700 rounded p-2 text-sm border border-slate-600" oninput="calc()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results Display -->
+                    <div class="bg-white/5 p-6 rounded-xl border border-white/10 flex flex-col justify-center">
+                        <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-4">
+                            <span class="text-slate-300">المبلغ الأساسي (Net)</span>
+                            <span class="text-xl font-bold" id="resBase">0 TL</span>
+                        </div>
+                        <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-4">
+                            <span class="text-amber-300">الضريبة (KDV 20%)</span>
+                            <span class="text-xl font-bold text-amber-400" id="resVat">0 TL</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-emerald-900/30 p-4 rounded-lg">
+                            <span class="text-emerald-300 font-bold">الإجمالي المستحق</span>
+                            <span class="text-3xl font-extrabold text-emerald-400" id="resTotal">0 TL</span>
+                        </div>
+                        <p class="text-xs text-center text-slate-500 mt-4" id="noteText">يتم خصم الإجمالي من رصيد الباقة</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Logic Script -->
+    <script>
+        let currentMode = 'order';
+
+        function setMode(mode) {
+            currentMode = mode;
+            // UI Toggles
+            document.getElementById('btnOrder').className = mode === 'order' ? 'px-6 py-2 rounded-md bg-amber-500 text-white transition' : 'px-6 py-2 rounded-md text-slate-300 hover:text-white transition';
+            document.getElementById('btnHourly').className = mode === 'hourly' ? 'px-6 py-2 rounded-md bg-purple-500 text-white transition' : 'px-6 py-2 rounded-md text-slate-300 hover:text-white transition';
+            
+            document.getElementById('orderInputs').classList.toggle('hidden', mode !== 'order');
+            document.getElementById('hourlyInputs').classList.toggle('hidden', mode !== 'hourly');
+            
+            calc();
+        }
+
+        function calc() {
+            let base = 0;
+            const VAT_RATE = 0.20;
+
+            if (currentMode === 'order') {
+                const fee = parseFloat(document.getElementById('inpFee').value) || 0;
+                base = fee;
+                document.getElementById('noteText').innerText = "حساب لكل طلب (Per Order Basis)";
+            } else {
+                const hours = parseFloat(document.getElementById('inpHours').value) || 0;
+                const rate = parseFloat(document.getElementById('inpRate').value) || 0;
+                const orders = parseFloat(document.getElementById('inpOrders').value) || 0;
+                const fix = parseFloat(document.getElementById('inpFix').value) || 0;
+                
+                base = (hours * rate) + (orders * fix);
+                document.getElementById('noteText').innerText = `حساب يومي: ${hours} ساعة و ${orders} طلب`;
+            }
+
+            const vat = base * VAT_RATE;
+            const total = base + vat;
+
+            document.getElementById('resBase').innerText = base.toLocaleString('en-US') + ' TL';
+            document.getElementById('resVat').innerText = vat.toLocaleString('en-US') + ' TL';
+            document.getElementById('resTotal').innerText = total.toLocaleString('en-US') + ' TL';
+        }
+
+        // Init
+        calc();
+    </script>
+
+</body>
+</html>
