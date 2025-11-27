@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام Akıllı Kurye | الإسناد العادل</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* Arabic Font & RTL Support */
+        body { font-family: 'Cairo', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .card-hover:hover { transform: translateY(-4px); transition: 0.3s; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        
+        /* Funnel Styling */
+        .funnel-step {
+            position: relative;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            /* Create the funnel shape (trapezoid) */
+            clip-path: polygon(0% 0%, 100% 0%, 95% 100%, 5% 100%);
+        }
+    </style>
+</head>
+<body class="antialiased overflow-x-hidden">
+
+    <!-- Navigation -->
+    <nav class="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="font-bold text-lg flex items-center gap-2">
+                <span class="text-2xl">🛵</span> 
+                <span>Akıllı Kurye <span class="text-xs font-normal text-slate-400">| Financial & Dispatch System</span></span>
+            </div>
+            <div class="hidden lg:flex gap-4 text-xs font-medium">
+                <a href="#rules" class="hover:text-amber-400">القواعد المالية</a>
+                <a href="#merchant-logic" class="hover:text-amber-400">احتساب المتاجر</a>
+                <a href="#driver-logic" class="hover:text-blue-400">احتساب السائقين</a>
+                <a href="#smart-dispatch" class="hover:text-emerald-400 font-bold">الإسناد العادل</a>
+                <a href="#simulator" class="hover:text-amber-400">محاكي الحسابات</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="bg-gradient-to-br from-slate-800 to-slate-900 text-white py-16 px-4 text-center border-b-4 border-amber-500">
+        <h1 class="text-3xl md:text-5xl font-extrabold mb-4">
+            المنظومة المالية و<span class="text-amber-500">الإسناد العادل</span> لـ Akıllı Kurye
+        </h1>
+        <p class="text-slate-300 max-w-2xl mx-auto mb-6">
+            استراتيجية متكاملة لضمان كفاءة مالية عالية وعدالة في توزيع الطلبات في السوق التركي.
+        </p>
+        <div class="flex justify-center gap-4 text-sm font-mono">
+            <span class="bg-amber-600 px-3 py-1 rounded">KDV 20%</span>
+            <span class="bg-blue-600 px-3 py-1 rounded">Round Robin</span>
+            <span class="bg-emerald-600 px-3 py-1 rounded">SLA 45s Timeout</span>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-12 space-y-16">
+
+        <!-- 1. General Financial Rules & Data Flow -->
+        <section id="rules" class="bg-white p-8 rounded-3xl shadow-lg border border-slate-200">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 border-b pb-2">1. القواعد المالية والتدفق العام</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-slate-50 p-4 rounded-xl border-r-4 border-amber-500">
+                    <h3 class="font-bold text-amber-700">الضريبة المضافة (KDV)</h3>
+                    <p class="text-sm text-slate-600 mt-1">نسبة ثابتة <span class="font-bold">20%</span> تضاف على صافي الإيرادات. يتم فصلها محاسبياً (Gross vs. Net).</p>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl border-r-4 border-blue-500">
+                    <h3 class="font-bold text-blue-700">الدورة والفاتورة</h3>
+                    <p class="text-sm text-slate-600 mt-1">الدورة الأسبوعية (الاثنين-الأحد). المتاجر تعمل بنظام "الآجل" (Credit) والتسوية أسبوعية.</p>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl border-r-4 border-emerald-500">
+                    <h3 class="font-bold text-emerald-700">هيكل البيانات</h3>
+                    <p class="text-sm text-slate-600 mt-1">يعتمد على الفصل بين كيانات: <span class="font-bold">الطلبات</span> (Orders)، <span class="font-bold">المتاجر</span> (Merchants)، <span class="font-bold">السائقين</span> (Drivers)، و <span class="font-bold">الفواتير</span> (Payments).</p>
+                </div>
+            </div>
+            
+            <h3 class="text-xl font-bold text-slate-800 mt-8 mb-4 border-b pb-2">مخطط التدفق المالي (Financial Flow Diagram)</h3>
+            <div class="text-center p-4">
+                 
+            </div>
+            <p class="text-sm text-slate-500 mt-4 text-center">يوضح المخطط أعلاه كيف يتم تسجيل رسوم التوصيل (كإيراد) وأجر السائق (كمصروف) ووعاء الضريبة المضافة لكل عملية.</p>
+        </section>
+
+        <!-- 2. Merchant Logic (Revenue) -->
+        <section id="merchant-logic">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center border-b-4 border-amber-100 pb-2">2. آليات حساب المتاجر (Revenue)</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Model A: Per Order -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-amber-500">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-slate-800">أ. نظام الطلبات (Per Order)</h3>
+                        <span class="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded">Standard Fee</span>
+                    </div>
+                    <ul class="space-y-3 text-sm text-slate-600">
+                        <li class="flex items-start gap-2">
+                            <span>✅</span>
+                            <span><b>رسوم التوصيل:</b> تُحدد حسب فئة المسافة المتفق عليها.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span>✅</span>
+                            <span><b>المعادلة:</b> رسوم التوصيل (Net) + (20% KDV) = الإجمالي المستحق.</span>
+                        </li>
+                        <li class="flex items-start gap-2 bg-red-50 p-2 rounded border border-red-100">
+                            <span>⚠️</span>
+                            <span><b>شرط الحد الأدنى (Minimum Guarantee):</b> إذا لم يحقق العدد المطلوب من الطلبات أسبوعياً، يتم تطبيق غرامة تُضاف للإيرادات:
+                            <br><code>(الطلبات الناقصة × سعر أقل فئة مسافة)</code>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Model B: Hourly -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-purple-500">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-slate-800">ب. نظام الساعات (Dedicated)</h3>
+                        <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">VIP / High Volume</span>
+                    </div>
+                    <ul class="space-y-3 text-sm text-slate-600">
+                        <li class="flex items-start gap-2">
+                            <span>✅</span>
+                            <span><b>التسعير:</b> يتم احتساب التكلفة بناءً على الساعات الفعلية المتفق عليها.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span>✅</span>
+                            <span><b>معادلة الحساب:</b><br>
+                            <code>(عدد الساعات × سعر الساعة) + (عدد الطلبات × مبلغ ثابت)</code>
+                            </span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span>✅</span>
+                            <span><b>الضريبة:</b> تُحتسب 20% KDV على الإجمالي الناتج من المعادلة.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Driver Logic (Expense) -->
+        <section id="driver-logic">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center border-b-4 border-blue-100 pb-2">3. آليات حساب السائقين (Expense)</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Driver Model A -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-blue-500">
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">أ. السائق الحر (Per Order)</h3>
+                    <div class="text-sm text-slate-600 space-y-2">
+                        <p>يتم الدفع له حسب <b>جدول المنطقة والمسافة</b> الموحد. يتم إسناد الطلبات له عبر خوارزمية "الإسناد العادل" (القسم 4).</p>
+                        <div class="bg-blue-50 p-3 rounded border border-blue-100 font-mono text-xs">
+                            1-5 كم  : 100 TL<br>
+                            6-10 كم : 150 TL<br>
+                            10+ كم  : +X TL لكل كم إضافي
+                        </div>
+                        <p class="text-xs text-slate-400 mt-2">* الأجر هو صافي (Net) ولا يخصم منه ضريبة Akıllı Kurye.</p>
+                    </div>
+                </div>
+
+                <!-- Driver Model B -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-indigo-500">
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">ب. سائق بالساعة (Hourly/Shift)</h3>
+                    <div class="text-sm text-slate-600 space-y-2">
+                        <p>يتم الدفع له أجر يومي/أسبوعي ثابت مقابل التوافر والتخصيص لمتجر محدد.</p>
+                        <div class="bg-indigo-50 p-3 rounded border border-indigo-100">
+                            <b>الراتب:</b> يحدد حسب العقد (سعر الساعة × عدد الساعات).<br>
+                            <b>الأولوية:</b> تعطى له الأولوية لطلبات المتجر المخصص له فقط.
+                        </div>
+                        <p class="text-red-500 text-xs font-bold mt-2">🛑 مهم: لا يخضع لقواعد الإسناد العادل العامة، بل يخضع لتخصيص مباشر.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Smart Dispatch Deep Dive -->
+        <section id="smart-dispatch" class="bg-slate-800 rounded-3xl p-8 text-white relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-slate-700 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+            <div class="absolute bottom-0 left-0 w-64 h-64 bg-emerald-700 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+
+            <div class="relative z-10 text-center mb-10">
+                <h2 class="text-3xl font-extrabold mb-2 text-emerald-400">4. تحليل خوارزمية الإسناد العادل</h2>
+                <p class="text-slate-300">الهدف: العدالة (Round Robin) + السرعة (SLA 45s) + الكفاءة (Route Matching).</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start max-w-6xl mx-auto">
+                
+                <!-- Left: The Selection Funnel -->
+                <div>
+                    <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+                        <span class="bg-emerald-500 w-8 h-8 rounded-full flex items-center justify-center text-sm text-slate-900">1</span>
+                        قمع ترشيح السائقين (Selection Funnel)
+                    </h3>
+                    
+                    <div class="text-center p-4">
+                        
+                    </div>
+
+                    <div class="space-y-1">
+                        <!-- Step 1 -->
+                        <div class="funnel-step bg-slate-600 w-full mx-auto">
+                            1. التصفية الأساسية (Geo, Status, Tokens)
+                        </div>
+                        <!-- Step 2 -->
+                        <div class="funnel-step bg-blue-600 w-[85%] mx-auto">
+                            2. العدالة (Round Robin Sort)
+                            <div class="text-xs font-normal text-blue-100 mt-1">ترتيب حسب: الأقدمية في الانتظار (Last Assigned Time)</div>
+                        </div>
+                        <!-- Step 3 (Crucial) -->
+                        <div class="funnel-step bg-amber-600 w-[70%] mx-auto border-2 border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.5)]">
+                            3. تطابق المسار (Vector Matching)
+                            <div class="text-xs font-normal text-amber-100 mt-1">فلترة أفضل السائقين بناءً على اتجاه سيرهم الحالي بالنسبة للطلب.</div>
+                        </div>
+                        <!-- Step 4 -->
+                        <div class="funnel-step bg-emerald-600 w-[55%] mx-auto shadow-lg">
+                            4. اختيار السائق (Single Driver)
+                            <div class="text-xs font-normal text-emerald-100 mt-1">اختيار السائق رقم #1 وإرسال الإشعار له فقط.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: The SLA & Timeout Logic -->
+                <div class="bg-slate-900/50 p-6 rounded-2xl border border-slate-700">
+                    <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+                        <span class="bg-orange-500 w-8 h-8 rounded-full flex items-center justify-center text-sm text-slate-900">2</span>
+                        آلية المهلة التسلسلية (Sequential SLA Timeout)
+                    </h3>
+
+                    <p class="text-sm text-slate-300 mb-6 leading-relaxed">
+                        نستخدم وظيفة مجدولة (Queue Job) لإرسال الطلب بشكل تسلسلي. إذا لم يتم القبول أو الرفض خلال <span class="font-bold text-orange-400">45 ثانية</span>، ينتقل الطلب إلى السائق التالي في قائمة العدالة (Round Robin).
+                    </p>
+
+                    <!-- Visualization of Timer -->
+                    <div class="relative pt-8 pb-4">
+                        <!-- Timeline Line -->
+                        <div class="absolute top-12 left-0 w-full h-1 bg-slate-600 rounded"></div>
+                        
+                        <!-- Steps -->
+                        <div class="flex justify-between relative z-10">
+                            <div class="text-center w-1/3">
+                                <div class="w-4 h-4 bg-emerald-500 rounded-full mx-auto mb-2 shadow-[0_0_10px_#10b981]"></div>
+                                <div class="text-xs font-bold text-emerald-400">0 ثانية</div>
+                                <div class="text-[10px] text-slate-400">إشعار السائق الأول</div>
+                            </div>
+                            
+                            <div class="text-center w-1/3">
+                                <div class="w-4 h-4 bg-orange-500 rounded-full mx-auto mb-2 animate-pulse"></div>
+                                <div class="text-xs font-bold text-orange-400">45 ثانية</div>
+                                <div class="text-[10px] text-slate-400">الرفض التلقائي أو الانتقال</div>
+                            </div>
+
+                            <div class="text-center w-1/3">
+                                <div class="w-4 h-4 bg-blue-500 rounded-full mx-auto mb-2"></div>
+                                <div class="text-xs font-bold text-blue-400">46 ثانية</div>
+                                <div class="text-[10px] text-slate-400">إشعار السائق الثاني</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 bg-slate-700 rounded-full h-2 w-full overflow-hidden">
+                            <div class="bg-gradient-to-r from-emerald-500 to-orange-500 h-full w-full animate-pulse" style="animation-duration: 45s;"></div>
+                        </div>
+                        <div class="text-center text-xs text-slate-500 mt-1">يضمن هذا الإجراء ألا تتجاوز مهلة الإسناد للسائق الواحد 45 ثانية.</div>
+                    </div>
+
+                    <div class="mt-6 p-4 bg-orange-900/30 border border-orange-500/30 rounded-lg text-xs text-orange-200">
+                        🔗 <b>وظيفة التنفيذ (PHP Job):</b> تتم إدارة هذه الآلية بواسطة وظيفة `SmartDispatchJob` التي تعيد جدولة نفسها حتى يتم قبول الطلب أو انتهاء قائمة السائقين المؤهلين.
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 5. Simulator -->
+        <section id="simulator" class="bg-white p-10 rounded-3xl shadow-lg border border-slate-200">
+            <div class="relative z-10">
+                <h2 class="text-2xl font-bold mb-8 text-slate-800 text-center">5. محاكي Akıllı Kurye المالي</h2>
+                
+                <!-- Toggle Mode -->
+                <div class="flex justify-center mb-8 bg-slate-100 p-1 rounded-lg inline-flex w-max mx-auto border border-slate-200">
+                    <button onclick="setMode('order')" id="btnOrder" class="px-6 py-2 rounded-md bg-amber-500 text-white transition shadow">نظام الطلبات</button>
+                    <button onclick="setMode('hourly')" id="btnHourly" class="px-6 py-2 rounded-md text-slate-500 hover:bg-slate-200 transition">نظام الساعات</button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                    
+                    <!-- Input Controls -->
+                    <div class="space-y-6">
+                        <!-- Order Mode Inputs -->
+                        <div id="orderInputs">
+                            <label class="block text-xs text-slate-500 mb-1 font-bold">المسافة (كم)</label>
+                            <input type="range" id="inpDist" min="1" max="15" value="5" class="w-full mb-4 accent-amber-500" oninput="calc()">
+                            
+                            <label class="block text-xs text-slate-500 mb-1 font-bold">سعر الفئة (الأساس - Net)</label>
+                            <input type="number" id="inpFee" value="100" class="w-full bg-slate-50 rounded p-3 text-sm border border-slate-300 focus:border-amber-500 focus:outline-none" oninput="calc()">
+                        </div>
+
+                        <!-- Hourly Mode Inputs -->
+                        <div id="hourlyInputs" class="hidden">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs text-slate-500 mb-1 font-bold">عدد الساعات</label>
+                                    <input type="number" id="inpHours" value="10" class="w-full bg-slate-50 rounded p-3 text-sm border border-slate-300" oninput="calc()">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-500 mb-1 font-bold">سعر الساعة</label>
+                                    <input type="number" id="inpRate" value="200" class="w-full bg-slate-50 rounded p-3 text-sm border border-slate-300" oninput="calc()">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-500 mb-1 font-bold">عدد الطلبات</label>
+                                    <input type="number" id="inpOrders" value="30" class="w-full bg-slate-50 rounded p-3 text-sm border border-slate-300" oninput="calc()">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-500 mb-1 font-bold">مبلغ ثابت/طلب</label>
+                                    <input type="number" id="inpFix" value="10" class="w-full bg-slate-50 rounded p-3 text-sm border border-slate-300" oninput="calc()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results Display -->
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 flex flex-col justify-center">
+                        <div class="flex justify-between items-center mb-4 border-b border-slate-200 pb-4">
+                            <span class="text-slate-600">المبلغ الأساسي (صافي الإيراد)</span>
+                            <span class="text-xl font-bold text-slate-800" id="resBase">0 TL</span>
+                        </div>
+                        <div class="flex justify-between items-center mb-4 border-b border-slate-200 pb-4">
+                            <span class="text-amber-600 font-bold">الضريبة (KDV 20%)</span>
+                            <span class="text-xl font-bold text-amber-600" id="resVat">0 TL</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-emerald-100 p-4 rounded-lg border border-emerald-200">
+                            <span class="text-emerald-800 font-bold">الإجمالي المستحق (Gross)</span>
+                            <span class="text-3xl font-extrabold text-emerald-700" id="resTotal">0 TL</span>
+                        </div>
+                        <p class="text-xs text-center text-slate-400 mt-4" id="noteText">يتم احتساب إجمالي الفاتورة المستحقة على المتجر.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Logic Script -->
+    <script>
+        let currentMode = 'order';
+
+        function setMode(mode) {
+            currentMode = mode;
+            // UI Toggles
+            document.getElementById('btnOrder').className = mode === 'order' 
+                ? 'px-6 py-2 rounded-md bg-amber-500 text-white transition shadow' 
+                : 'px-6 py-2 rounded-md text-slate-500 hover:bg-slate-200 transition';
+            
+            document.getElementById('btnHourly').className = mode === 'hourly' 
+                ? 'px-6 py-2 rounded-md bg-purple-500 text-white transition shadow' 
+                : 'px-6 py-2 rounded-md text-slate-500 hover:bg-slate-200 transition';
+            
+            document.getElementById('orderInputs').classList.toggle('hidden', mode !== 'order');
+            document.getElementById('hourlyInputs').classList.toggle('hidden', mode !== 'hourly');
+            
+            calc();
+        }
+
+        function calc() {
+            let base = 0;
+            const VAT_RATE = 0.20;
+
+            if (currentMode === 'order') {
+                const fee = parseFloat(document.getElementById('inpFee').value) || 0;
+                base = fee;
+                document.getElementById('noteText').innerText = `المسافة الحالية: ${document.getElementById('inpDist').value} كم | احتساب لكل طلب (Per Order Basis)`;
+            } else {
+                const hours = parseFloat(document.getElementById('inpHours').value) || 0;
+                const rate = parseFloat(document.getElementById('inpRate').value) || 0;
+                const orders = parseFloat(document.getElementById('inpOrders').value) || 0;
+                const fix = parseFloat(document.getElementById('inpFix').value) || 0;
+                
+                // Formula: (Hours * Rate) + (Orders * Fixed Fee)
+                base = (hours * rate) + (orders * fix);
+                document.getElementById('noteText').innerText = `حساب وردية: ${hours} ساعة و ${orders} طلب (VIP Dedicated)`;
+            }
+
+            const vat = base * VAT_RATE;
+            const total = base + vat;
+
+            // Display results with Turkish Lira formatting
+            document.getElementById('resBase').innerText = base.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' TL';
+            document.getElementById('resVat').innerText = vat.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' TL';
+            document.getElementById('resTotal').innerText = total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' TL';
+        }
+
+        // Init
+        document.getElementById('inpDist').addEventListener('input', calc);
+        calc();
+    </script>
+
+</body>
+</html>
